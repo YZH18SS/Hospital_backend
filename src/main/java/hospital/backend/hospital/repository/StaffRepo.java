@@ -18,4 +18,7 @@ public class StaffRepo {
                 new BeanPropertyRowMapper<Staff>(Staff.class),id);
         return staff;
     }
+    public void updateStaff(Integer id,String name,int age,int gender){
+        jdbcTemplate.update("update staff set `name`=?,age=?,gender=? where id=?",name,age,gender,id);
+    }
 }
