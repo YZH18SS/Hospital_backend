@@ -1,0 +1,1 @@
+insert into staff (`name`,age,gender,job) values ("王小虎",18,0,0);
