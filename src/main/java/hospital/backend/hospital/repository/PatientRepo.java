@@ -53,9 +53,9 @@ public class PatientRepo {
         return count==null?0:count;
     }
     public int selectFreeBed(int treatArea){
-        Integer bedID = jdbcTemplate.queryForObject("select id from bed where patientID=0 and treatArea=?",
-                Integer.class,treatArea);
-        return  bedID==null?0:bedID;
+        List<Bed> beds = jdbcTemplate.query("select id from bed where patientID=0 and treatArea=?",
+                new BeanPropertyRowMapper<Bed>(Bed.class),treatArea);
+        return  beds.size()==0?0:beds.get(0).id;
     }
     public void updateTransferFailed(int id){
         jdbcTemplate.update("update patient set waitTransfer=? where id=?",Patient.WAITING_TRANSFER,id);
@@ -93,14 +93,14 @@ public class PatientRepo {
         return bedList;
     }
     public Test selectTestByPatientIDAndTestDate(int patientID,String testDate){
-        Test test = jdbcTemplate.queryForObject("select * from test where patientID=? and testDate=?",
-                Test.class,patientID,testDate);
-        return test;
+        List<Test> tests = jdbcTemplate.query("select * from test where patientID=? and testDate=?",
+                new BeanPropertyRowMapper<Test>(Test.class),patientID,testDate);
+        return tests.size() == 0?null:tests.get(0);
     }
     public Register selectRegisterByPatientIDAndRegisterDate(int patientID, String registerDate){
-        Register register = jdbcTemplate.queryForObject("select * from test where patientID=? and registerDate=?",
-                Register.class,patientID,registerDate);
-        return register;
+        List<Register> registers = jdbcTemplate.query("select * from register where patientID=? and registerDate=?",
+                new BeanPropertyRowMapper<Register>(Register.class),patientID,registerDate);
+        return registers.size()==0?null: registers.get(0);
     }
     public List<Patient> selectWaitingTransfer(int treatArea){
         return jdbcTemplate.query("select * from patient where waitTransfer = ? and lifeCondition=? and treatArea!=?",

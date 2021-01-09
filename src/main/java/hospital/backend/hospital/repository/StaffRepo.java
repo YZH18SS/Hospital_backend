@@ -40,4 +40,7 @@ public class StaffRepo {
                 new BeanPropertyRowMapper<Staff>(Staff.class),Staff.NURSE_LEADER,treatArea);
         return staff;
     }
+    public void deleteNurseById(int id){
+        jdbcTemplate.update("delete from staff where id=?",id);
+    }
 }

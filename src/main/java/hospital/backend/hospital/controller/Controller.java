@@ -78,6 +78,7 @@ public class Controller {
         int gender = Integer.parseInt(request.get("gender").toString());
         int treatArea = staffRepo.selectById(nurseLeaderId).getTreatArea();
         staffRepo.insertRoomNurse(name,age,gender,treatArea);
+        service.transferFree(treatArea);
         Map<String,Integer> staffResponse = new HashMap<>();
         staffResponse.put("id",staffRepo.count());
         Map<String,Object> response = new HashMap<>();
@@ -90,12 +91,14 @@ public class Controller {
         int count = patientRepo.countByNurseID(staffId);
         Map<String,Integer> response = new HashMap<>();
         response.put("status",count);
+        if(count == 0)
+            staffRepo.deleteNurseById(staffId);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/deleteSatisfiedPatient")
     public void deleteSatisfiedPatient(@RequestBody Map<String,Object> request){
         int patientId = Integer.parseInt(request.get("patientId").toString());
-        patientRepo.updateLifeCondition(patientId, Patient.TREATED);
+        service.updateLifeCondition(patientId,Patient.TREATED);
     }
     @PostMapping("/searchNurseLeader")
     public ResponseEntity<Map<String,Object>> searchNurseLeader(@RequestBody Map<String,Object> request){
@@ -149,9 +152,10 @@ public class Controller {
         int staffId = Integer.parseInt(request.get("staffId").toString());
         int roomNurseId = Integer.parseInt(request.get("roomNurseId").toString());
         int treatAreaStaff = staffRepo.selectById(staffId).getTreatArea();
-        int treatAreaNurse = staffRepo.selectById(roomNurseId).getTreatArea();
+        Staff nurse = staffRepo.selectById(roomNurseId);
+        int treatAreaNurse = nurse.getTreatArea();
         Map<String,Object> response = new HashMap<>();
-        if(treatAreaNurse != treatAreaStaff){
+        if(treatAreaNurse != treatAreaStaff||nurse.getJob() != Staff.NURSE){
             response.put("status",1);
         }else {
             response.put("status",0);
@@ -182,7 +186,7 @@ public class Controller {
             Map<String,Object> bedResponse = new HashMap<>();
             bedResponse.put("id",bed.id);
             bedResponse.put("roomID",bed.roomID);
-            bedResponse.put("state",bed.patientID==0?-1:1);
+            bedResponse.put("state",bed.patientID==0?-1:bed.patientID);
             beds[i] = bedResponse;
             i++;
         }

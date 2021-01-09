@@ -15,6 +15,7 @@ public class Patient {
     public static final int NORMAL_TEST_COUNT = 2;
     public static final int WAITING_TRANSFER = 1;
     public static final int ISOLATING_AREA = 0;
+    public static final int LIGHT_SYMPTOM=1;
     private int id;
     private String name;
     private int gender;

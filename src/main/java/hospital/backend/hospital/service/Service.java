@@ -106,7 +106,7 @@ public class Service {
     }
     public boolean canLeaveHospital(Patient patient){
         return patient.getTempCount() >= Patient.NORMAL_TEMP_COUNT &&
-                patient.getTestCount() >= Patient.NORMAL_TEST_COUNT;
+                patient.getTestCount() >= Patient.NORMAL_TEST_COUNT && patient.getGrade() == Patient.LIGHT_SYMPTOM;
     }
     public void updateGrade(int patientId,int grade){
         Patient patient = patientRepo.selectById(patientId);
@@ -125,6 +125,10 @@ public class Service {
         patientRepo.freeBed(patientID);
         //不清理病房护士是因为这时候病人的生命状态已经变为出院或死亡，不算在空闲护士计数里
         int treatArea = patient.getTreatArea();
+        transferFree(treatArea);
+    }
+
+    public void transferFree(int treatArea) {
         List<Patient> patientList = patientRepo.selectByTreatArea(Patient.ISOLATING_AREA);
         patientList.removeIf(patient1 -> patient1.getLifeCondition()!=Patient.TREATING);
         if(patientList.size() == 0)
@@ -132,6 +136,7 @@ public class Service {
         if(patientList.size() == 0)
             return;
         Patient waitingPatient = patientList.get(0);
-        transfer(waitingPatient.getId(),treatArea);
+        transfer(waitingPatient.getId(), treatArea);
     }
+
 }
